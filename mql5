@@ -1,0 +1,62 @@
+
+//+------------------------------------------------------------------+
+//|                                            Spread Meter mt4.mq5  |
+//|                      Copyright 2022, Forex Robot Easy Team       |
+//|                                          https://forexroboteasy.com|
+//+------------------------------------------------------------------+
+
+#property indicator_chart_window
+#property indicator_buffers 3
+#property indicator_color1 Green
+#property indicator_color2 Red
+#property indicator_color3 Blue
+
+double SpreadBuffer[];
+double MaxSpreadBuffer[];
+double MinSpreadBuffer[];
+
+//+------------------------------------------------------------------+
+//| Custom indicator initialization function                         |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+    IndicatorBuffers(3);
+    SetIndexBuffer(0, SpreadBuffer);
+    SetIndexBuffer(1, MaxSpreadBuffer);
+    SetIndexBuffer(2, MinSpreadBuffer);
+
+    IndicatorShortName('Spread Meter');
+
+    return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator iteration function                              |
+//+------------------------------------------------------------------+
+int OnCalculate(const int rates_total,
+                const int prev_calculated,
+                const datetime& time[],
+                const double& open[],
+                const double& high[],
+                const double& low[],
+                const double& close[],
+                const long& tick_volume[],
+                const long& volume[],
+                const int& spread[])
+{
+    int limit = MathMin(rates_total, Bars - prev_calculated);
+
+    for (int i = 0; i < limit; i++)
+    {
+        SpreadBuffer[i] = spread[i];
+    }
+
+    double maxSpread = ArrayMaximum(SpreadBuffer, limit);
+    double minSpread = ArrayMinimum(SpreadBuffer, limit);
+    double avgSpread = ArrayAverage(SpreadBuffer, limit);
+
+    ArrayInitialize(MaxSpreadBuffer, maxSpread);
+    ArrayInitialize(MinSpreadBuffer, minSpread);
+
+    return(rates_total);
+}
